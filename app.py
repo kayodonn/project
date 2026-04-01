@@ -40,11 +40,12 @@ if json_path.exists():
 
 events = [
     {
-        "id" : "HW1",
-        "title": "Intro to Database",
-        "description" : "basics of database design",
-        "points": 100,
-        "type" : "homework"
+        "id" : "Event1",
+        "title": "Community Pizza Party",
+        "host" : "John Doe",
+        "needs_list" : {"plates": "Elmo", "cups": "Cookie Monster"},
+        "event_date": "2025-05-01",
+        "event_location": "Community Center",
     }
 ]
 
