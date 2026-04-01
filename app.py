@@ -73,14 +73,6 @@ if st.session_state["role"] == "Attendee":
 elif st.session_state['role'] == "Admin":
     st.markdown("Welcome! This is the Manager Dashboard")
 
-    if st.button("Log out", type="primary", use_container_width= True):
-        with st.spinner("loggin out..."):
-            st.session_state["logged_in"] = False
-            st.session_state["user"] = None
-            st.session_state["role"] = None
-            st.session_state["page"]= "login"
-            time.sleep(4)
-            st.rerun()
 
 
 else:
@@ -115,8 +107,8 @@ else:
     # --- REGISTRATION ---
     st.subheader("New Admin Account")
     with st.container(border=True):
-        new_email = st.text_input("Email", key= "email_register")
-        new_password = st.text_input("Password", type="password", key= "password_edit")
+        new_username = st.text_input("Username", key= "username_register")
+        new_password = st.text_input("Password", type="password", key= "password_register")
         
         if st.button("Create Account", key= "register_btn"):
             with st.spinner("Creating account..."):
@@ -128,7 +120,16 @@ with st.sidebar:
     st.markdown("Event Manager Sidebar")
     if  st.session_state["logged_in"] == True:
         user = st.session_state["user"]
-        st.markdown(f"Loged User Email: {user['email']}")
+        st.markdown(f"Loged Username: {user['username']}")
+        if st.button("Log out", type="primary", use_container_width= True):
+            with st.spinner("loggin out..."):
+                st.session_state["logged_in"] = False
+                st.session_state["user"] = None
+                st.session_state["role"] = None
+                st.session_state["page"]= "login"
+                time.sleep(4)
+                st.rerun()
+    
 
 
 
