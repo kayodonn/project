@@ -57,7 +57,7 @@ if json_path_event.exists():
         events = json.load(f)
 
 
-if st.session_state["role"] == "Atendee":
+if st.session_state["role"] == "Attendee":
     if st.session_state["page"] == "home":
         st.markdown("Welcome! This is the Attendee Dashboard")
         if st.button("Go to Dashboard", key= "dashboard_view_btn", type= "primary",use_container_width=True):
@@ -136,3 +136,5 @@ with st.sidebar:
 
 
 ### This is a test
+
+
