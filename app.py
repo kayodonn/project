@@ -129,3 +129,10 @@ with st.sidebar:
     if  st.session_state["logged_in"] == True:
         user = st.session_state["user"]
         st.markdown(f"Loged User Email: {user['email']}")
+
+
+
+
+
+
+### This is a test
