@@ -71,7 +71,15 @@ if st.session_state["role"] == "Attendee":
 
 
 elif st.session_state['role'] == "Admin":
-    st.markdown("Welcome! This is the Manager Dashboard")
+    st.markdown("## Event Dashboard")
+    if st.button("Create New Event", key= "create_event_btn", type="primary", use_container_width=True):
+        st.session_state["page"] = "create_event"
+        st.rerun()
+    
+    
+
+
+
 
 
 
@@ -129,7 +137,8 @@ with st.sidebar:
                 st.session_state["page"]= "login"
                 time.sleep(4)
                 st.rerun()
-    
+
+ 
 
 
 
