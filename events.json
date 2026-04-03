@@ -1,0 +1,39 @@
+[
+  {
+    "event_id": "1",
+    "title": "Community Pizza Party",
+    "host_id": "1",
+    "needs_list": {
+      "plates": 4,
+      "cups": 0
+    },
+    "event_date": "2025-05-01",
+    "event_location": "Community Center"
+  },
+  {
+    "event_id": "2",
+    "title": "Sunday Dinner",
+    "host_id": "4",
+    "needs_list": {
+      "Meatballs": 0,
+      "Plates": 2,
+      "Pasta": 0,
+      "Cheese": 4,
+      "Cookies": 0
+    },
+    "event_date": "2026-04-03",
+    "event_location": "Grandma's House"
+  },
+  {
+    "event_id": "3",
+    "title": "Pottery Class",
+    "host_id": "4",
+    "needs_list": {
+      "Clay": 0,
+      "Tools": 0,
+      "Pottery Wheel": 0
+    },
+    "event_date": "2026-04-15",
+    "event_location": "Pottery Studio"
+  }
+]

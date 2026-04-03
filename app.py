@@ -30,6 +30,14 @@ users = [
         "password": "123ssag@43AE",
         "role": "Admin",
         "registered_at": "..."
+    },
+    {
+        "id": "2",
+        "full_name": "Normal Attendee",
+        "username": "attendee1",
+        "password": "abcdefg",
+        "role": "Attendee",
+        "registered_at": "..."
     }
 ]
 
@@ -59,14 +67,10 @@ if json_path_event.exists():
 
 
 if st.session_state["role"] == "Attendee":
-    if st.session_state["page"] == "home":
-        st.markdown("Welcome! This is the Attendee Dashboard")
-        if st.button("Go to Dashboard", key= "dashboard_view_btn", type= "primary",use_container_width=True):
-            st.session_state["page"] = "dashboard"
-            st.rerun()
-    elif st.session_state["page"] == "dashboard":
-        st.markdown("Dashboard")
-            
+    st.markdown("### Welcome! This is the Attendee Dashboard")
+    st.markdown("## All Events")
+    st.markdown("Select an event to sign up!")
+    
 
 
 
