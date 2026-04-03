@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 import json
 from pathlib import Path
@@ -70,7 +71,14 @@ if st.session_state["role"] == "Attendee":
     st.markdown("### Welcome! This is the Attendee Dashboard")
     st.markdown("## All Events")
     st.markdown("Select an event to sign up!")
-    
+
+    col1,col2 = st.columns([4,2])
+    with col1:
+        
+
+        st.dataframe(events)
+        selected_event = st.selectbox("Events", options=events, key= "event_selector",
+                    format_func= lambda x: f"{x['title']}")
 
 
 
