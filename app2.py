@@ -345,7 +345,3 @@ with st.sidebar:
         st.markdown("Admin view: joey")
         st.markdown("Attendee view: jim")
 
-
-## Notes to change
-#### Add user id to the host tab instead of a name.
-#### add above: user = st.session_state["user"]
