@@ -1,0 +1,41 @@
+[
+  {
+    "user_id": "1",
+    "full_name": "Database View",
+    "username": "dbview",
+    "password": "password",
+    "role": "databaseview"
+  },
+  {
+    "user_id": "2",
+    "full_name": "System Admin",
+    "username": "admin1",
+    "password": "123ssag@43AE",
+    "role": "Admin",
+    "registered_at": "..."
+  },
+  {
+    "user_id": "3",
+    "full_name": "Normal Attendee",
+    "username": "attendee1",
+    "password": "abcdefg",
+    "role": "Attendee",
+    "registered_at": "..."
+  },
+  {
+    "user_id": "4",
+    "full_name": "joey",
+    "username": "joey",
+    "password": "joey",
+    "role": "Admin",
+    "registered_at": "2026-04-02T23:30:53"
+  },
+  {
+    "user_id": "5",
+    "full_name": "jim the guy",
+    "username": "jim",
+    "password": "jim",
+    "role": "Attendee",
+    "registered_at": "2026-04-03T00:36:13"
+  }
+]

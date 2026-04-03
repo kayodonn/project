@@ -68,23 +68,37 @@ if json_path_event.exists():
 
 
 if st.session_state["role"] == "Attendee":
-    st.markdown("### Welcome! This is the Attendee Dashboard")
-    st.markdown("## All Events")
-    st.markdown("Select an event to sign up!")
+    if st.session_state["page"] == "home":
+        st.markdown("Welcome! This is the Attendee Dashboard")
+        if st.button("Sign Up for Event", key= "dashboard_view_btn", type= "primary",use_container_width=True):
+            st.session_state["page"] = "sign_up"
+            st.rerun()
+    elif st.session_state["page"] == "sign_up":
+        st.markdown("Dashboard")
+        st.markdown("## All Events")
+        st.markdown("Select an event to sign up!")
 
-    col1,col2 = st.columns([4,2])
-    with col1:
+        col1,col2 = st.columns([4,2])
+        with col1:
         
 
-        st.dataframe(events)
-        selected_event = st.selectbox("Events", options=events, key= "event_selector",
-                    format_func= lambda x: f"{x['title']}")
+            st.dataframe(events)
+            selected_event = st.selectbox("Events", options=events, key= "event_selector",
+                        format_func= lambda x: f"{x['title']}")
 
 
 
 
 elif st.session_state['role'] == "Admin":
-    st.markdown("Welcome! This is the Manager Dashboard")
+    st.markdown("## Event Dashboard")
+    if st.button("Create New Event", key= "create_event_btn", type="primary", use_container_width=True):
+        st.session_state["page"] = "create_event"
+        st.rerun()
+    
+    
+
+
+
 
 
 
@@ -142,7 +156,8 @@ with st.sidebar:
                 st.session_state["page"]= "login"
                 time.sleep(4)
                 st.rerun()
-    
+
+ 
 
 
 
