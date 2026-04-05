@@ -130,11 +130,11 @@ if st.session_state["logged_in"] and st.session_state["role"] == "databaseview":
 ## Attendee View
 elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
     if st.session_state["page"] == "dashboard":
-        st.markdown("## Welcome! This is the Attendee Dashboard")
+        st.title("Attendee Dashboard")
         if st.button("Sign Up for an Event", key= "dashboard_view_btn", type= "primary",use_container_width=True):
             st.session_state["page"] = "sign_up"
             st.rerun()
-        st.markdown("### Your Events")
+        st.header("Your Events")
         user_events = []
         for event in events:
             for item in event["needs_list"]:
@@ -154,16 +154,16 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
                             st.markdown(f"- {item}")
 
     elif st.session_state["page"] == "sign_up":
-        st.markdown("# Sign Up for an Event")
-        if st.button("Back to Dashboard", key="back_to_dashboard_btn"):
+        st.title("Sign Up for an Event")
+        if st.button("Back to Dashboard", key="attendee_back_btn"):
             st.session_state["page"] = "dashboard"
             st.rerun()
             
-        st.markdown("## All Events")
-        st.markdown("Select an event to sign up!")
+        st.header("All Events")
+        st.subheader("Select an event to sign up.")
         col1,col2 = st.columns([3,5])
         with col1:
-            selected_event = st.radio("Events", options=events, key= "event_selector",
+            selected_event = st.radio("Events", options=events, key= "attendee_event_selector",
                     format_func= lambda x: f"{x['title']}")
         with col2:
             with st.container(border=True):
@@ -182,18 +182,29 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
                                 st.markdown(f"- {item} (Unclaimed)")
                             else:
                                 st.markdown(f"- {item} claimed by {needs_list[item]}")
-                    item = st.selectbox("Select a need to claim", options=[i for i,v in needs_list.items() if v == 0], key="need_to_claim")
-                    if st.button("Sign Up!", key="sign_up_btn", use_container_width=True, type="primary"):
-                        if not item:
-                            st.error("Please select a need to claim.")
-                        elif item:
-                            with st.spinner("Signing you up..."):
-                                time.sleep(5)
+                    available_items = [i for i, v in needs_list.items() if v == 0]
+                    claimed_count = len([v for v in needs_list.values() if v not in (0, "", None)])
+                    total_count = len(needs_list)
+
+                    st.markdown(f"**Status:** {claimed_count}/{total_count} items claimed")
+
+                    if not available_items:
+                        st.warning("All items have been claimed for this event.")
+                        item = None
+                    else:
+                        item = st.selectbox("Select a need to claim", options=available_items,key="attendee_need_select")
+                    signup_disabled = not available_items
+
+                    if st.button("Sign Up",key="attendee_signup_btn",use_container_width=True,
+                        type="primary",disabled=signup_disabled):
+                        if item:
+                            with st.spinner("Processing your request…"):
+                                time.sleep(1)
                                 event_index = events.index(selected_event)
                                 events[event_index]["needs_list"][item] = user["full_name"]
                                 with json_path_event.open("w",encoding="utf-8") as f:
                                     json.dump(events,f)
-                                st.success(f"You have signed up to bring {item} for {selected_event['title']}!")
+                                st.success(f"You have signed up to bring {item} for {selected_event['title']}.")
                                 time.sleep(2)
                                 st.session_state["page"] = "dashboard"
                                 st.rerun()
@@ -204,22 +215,22 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
 ## Admin View
 elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
     if st.session_state["page"] == "create_event":
-        st.subheader("Create New Event")
-        if st.button("Back to Event Dashboard", key="back_to_dashboard_btn", use_container_width=True):
+        st.title("Create New Event")
+        if st.button("Back to Event Dashboard", key="admin_back_btn", use_container_width=True):
             st.session_state["page"] = "home"
             st.rerun()
         #Create a new event form
-        title = st.text_input("Event Title")
-        event_date = st.date_input("Event Date")
-        event_location = st.text_input("Location")
-        needs_raw = st.text_area("Needs List (one item per line)")
-        submitted = st.button("Save Event", use_container_width=True)
+        with st.container(border=True):
+            title = st.text_input("Event Title")
+            event_date = st.date_input("Event Date")
+            event_location = st.text_input("Location")
+            needs_raw = st.text_area("Needs List (one item per line)")
+            submitted = st.button("Save Event", use_container_width=True)
 
         if submitted:
             if not title.strip() or not event_location.strip():
                 st.error("Title and location are required.")
             else:
-                # Do the fun new line dictionary thing
                 needs_list = {}
                 for line in needs_raw.splitlines():
                     item = line.strip()
@@ -236,14 +247,13 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
                 }
                 events.append(new_event)
                 save_events(events)
-                st.success("Event created!")
+                st.success("Event created successfully.")
                 st.session_state["page"] = "home"
                 st.rerun()
 
-        st.stop()
 
     if st.session_state["page"] == "home":
-        st.markdown("## Event Dashboard")
+        st.title("Admin Dashboard")
 
         if st.button("Create New Event", key="create_event_btn", type="primary", use_container_width=True):
             st.session_state["page"] = "create_event"
@@ -258,19 +268,19 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
     # Get the events where the current user is the host
     user_events = [e for e in events if e["host_id"] == user_id]
 
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([3, 5])
 
     # Left side event list
     with col1:
-        st.markdown("### Your Events")
+        st.header("Your Events")
 
         if not user_events:
-            st.info("No Events Planned")
+            st.info("You have not created any events yet.")
             selected_event = None
         else:
             event_titles = [event["title"] for event in user_events]
 
-            selected_title = st.radio("Select an event", event_titles, key="event_selector")
+            selected_title = st.radio("Select an event", event_titles, key="admin_event_selector")
 
             # Get selected event object
             selected_event = next((e for e in user_events if e["title"] == selected_title), None )
@@ -278,30 +288,32 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
     # --- RIGHT SIDE (Event Details) ---
     with col2:
         if selected_event:
-            st.markdown(f"### {selected_event['title']}")
-            st.markdown(f"**Date:** {selected_event['event_date']}")
-            st.markdown(f"**Location:** {selected_event['event_location']}")
+            with st.container(border=True):
+                st.header(f"{selected_event['title']}")
+                st.markdown(f"**Date:** {selected_event['event_date']}")
+                st.markdown(f"**Location:** {selected_event['event_location']}")
+                st.write("---")
 
-            st.markdown("### Needs")
+                st.markdown("#### Needs")
 
-            needs_list = selected_event.get("needs_list", {})
-            event_needs = []
-            event_claimed = []
+                needs_list = selected_event.get("needs_list", {})
+                event_needs = []
+                event_claimed = []
 
-            if not needs_list:
-                st.write("No needs listed.")
-            else:
-                for item, value in needs_list.items():
-                    if value == 0 or value == "" or value is None:
-                        event_needs.append(item)
-                    else:
-                        event_claimed.append((item, value))
-            st.markdown("#### Unclaimed Needs:")
-            for item in event_needs:
-                st.markdown(f"- {item}")
-            st.markdown("#### Claimed Needs:")
-            for item, claimer in event_claimed:
-                st.markdown(f"- {item} claimed by {claimer}")
+                if not needs_list:
+                    st.write("No items have been added to this event yet.")
+                else:
+                    for item, value in needs_list.items():
+                        if value == 0 or value == "" or value is None:
+                            event_needs.append(item)
+                        else:
+                            event_claimed.append((item, value))
+                st.markdown("##### Unclaimed Needs:")
+                for item in event_needs:
+                    st.markdown(f"- {item}")
+                st.markdown("##### Claimed Needs:")
+                for item, claimer in event_claimed:
+                    st.markdown(f"- {item} claimed by {claimer}")
                     
 
 
@@ -319,7 +331,7 @@ else:
         password_input = st.text_input("Password", type="password", key="password_login")
 
         if st.button("Log In", type="primary", use_container_width=True):
-            with st.spinner("Logging in..."):
+            with st.spinner("Logging In..."):
                 time.sleep(2) # Fake backend delay
                 found_user = None
                 for user in users:
@@ -328,11 +340,14 @@ else:
                         break
 
                 if found_user:
-                    st.success(f"Welcome back, {found_user['username']}!")
+                    st.success(f"Welcome Back, {found_user['username']}!")
                     st.session_state["logged_in"] = True
                     st.session_state["user"] = found_user
                     st.session_state["role"] = found_user["role"]
-                    st.session_state["page"] = "home"
+                    if st.session_state["role"] == "Admin":
+                        st.session_state["page"] = "home"
+                    if st.session_state["role"] == "Attendee":
+                        st.session_state["page"] = "dashboard"
                     time.sleep(1)
                     st.rerun()
                 else:
@@ -353,7 +368,7 @@ else:
                 new_role = st.selectbox("Role", ["Admin", "Attendee"], key="role_register")
 
             if st.button("Create Account", key="register_btn", use_container_width=True):
-                with st.spinner("Creating account..."):
+                with st.spinner("Creating Account..."):
                     if not new_username.strip() or not new_password.strip():
                         st.error("Username and password are required.")
                     elif any(u["username"].strip().lower() == new_username.strip().lower() for u in users):
@@ -382,23 +397,25 @@ else:
 
 # Do the Sidebar
 with st.sidebar:
-    st.markdown("## Event Manager Sidebar")
+    st.title("Event Manager Sidebar")
     if  st.session_state["logged_in"] == True:
         user = st.session_state["user"]
-        st.markdown(f"Loged Username: {user['username']}")
-        if st.button("Log out", type="primary", use_container_width= True):
-            with st.spinner("loggin out..."):
+        st.markdown(f"**User:** {user['username']}")
+        st.markdown(f"**Role:** {user['role']}")
+        st.write("---")
+        if st.button("Log Out", use_container_width= True):
+            with st.spinner("Logging Out..."):
                 st.session_state["logged_in"] = False
                 st.session_state["user"] = None
                 st.session_state["role"] = None
                 st.session_state["page"]= "login"
-                time.sleep(4)
+                time.sleep(2)
                 st.rerun()
     else:
-        st.markdown("# Please log in to access the dashboard.")
-        st.markdown("Use following for database view:")
-        st.markdown("- Username: dbview")
-        st.markdown("- Password: password")
-        st.markdown("Admin view: joey")
-        st.markdown("Attendee view: jim")
+        st.markdown("Please log in to access the dashboard.")
+        #st.markdown("Use following for database view:")
+        #st.markdown("- Username: dbview")
+        #st.markdown("- Password: password")
+        #st.markdown("Admin view: joey")
+        #st.markdown("Attendee view: jim")
 
