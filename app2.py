@@ -19,16 +19,18 @@ if "role" not in st.session_state:
     st.session_state["role"] = None
 
 if "page" not in st.session_state:
-    st.session_state["page"] = "login"
+    st.session_state["page"] = "dashboard"
 
+if "selected_event_id" not in st.session_state:
+    st.session_state["selected_event_id"] = None
 
 
 # If not logged in, keep auth-related state clean.
 if not st.session_state["logged_in"]:
     st.session_state["user"] = None
     st.session_state["role"] = None
-    if st.session_state["page"] not in ("login", "register"):
-        st.session_state["page"] = "login"
+    if st.session_state["page"] not in ("dashboard", "login", "register"):
+        st.session_state["page"] = "dashboard"
 
 ## Set up users data
 users = [
@@ -73,6 +75,8 @@ if json_path.exists():
         if isinstance(loaded_users, list) and len(loaded_users) > 0:
             users = loaded_users
 
+
+## These def functions are to make sure that the code later is easier to read
 def save_users(data):
     json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
@@ -97,6 +101,7 @@ events = [
 ]
 
 next_event_id_counter = 1
+## We couldn't figure out a better way to do this than using a def
 def next_event_id(events):
     numeric_ids = [int(u["event_id"]) for u in events if str(u.get("event_id")).isdigit()]
     return str(max(numeric_ids) + 1) if numeric_ids else "1"
@@ -110,6 +115,7 @@ if json_path_event.exists():
         if isinstance(loaded_events, list) and len(loaded_events) > 0:
             events = loaded_events
 
+# use the def function to save the data to the json easily
 def save_events(data):
     json_path_event.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
@@ -131,9 +137,6 @@ if st.session_state["logged_in"] and st.session_state["role"] == "databaseview":
 elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
     if st.session_state["page"] == "dashboard":
         st.title("Attendee Dashboard")
-        if st.button("Sign Up for an Event", key= "dashboard_view_btn", type= "primary",use_container_width=True):
-            st.session_state["page"] = "sign_up"
-            st.rerun()
         st.header("Your Events")
         user_events = []
         for event in events:
@@ -152,12 +155,23 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
                     for item, claimer in event["needs_list"].items():
                         if claimer == user["full_name"]:
                             st.markdown(f"- {item}")
+                    ## Added in the leave event button
+                    st.write("")
+                    st.write("---")
+                    if st.button("Leave Event", key=f"leave_event_btn_{event['event_id']}", type="secondary"):
+                        with st.spinner("Processing your request..."):
+                            time.sleep(1)
+                            event_index = events.index(event)
+                            for item in events[event_index]["needs_list"]:
+                                if events[event_index]["needs_list"][item] == user["full_name"]:
+                                    events[event_index]["needs_list"][item] = 0
+                            save_events(events)
+                            st.success(f"You have left {event['title']}.")
+                            time.sleep(2)
+                            st.rerun()
 
     elif st.session_state["page"] == "sign_up":
         st.title("Sign Up for an Event")
-        if st.button("Back to Dashboard", key="attendee_back_btn"):
-            st.session_state["page"] = "dashboard"
-            st.rerun()
             
         st.header("All Events")
         st.subheader("Select an event to sign up.")
@@ -225,7 +239,7 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
             event_date = st.date_input("Event Date")
             event_location = st.text_input("Location")
             needs_raw = st.text_area("Needs List (one item per line)")
-            submitted = st.button("Save Event", use_container_width=True)
+            submitted = st.button("Save Event", key= "save_event_btn",use_container_width=True)
 
         if submitted:
             if not title.strip() or not event_location.strip():
@@ -254,12 +268,6 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
 
     if st.session_state["page"] == "home":
         st.title("Admin Dashboard")
-
-        if st.button("Create New Event", key="create_event_btn", type="primary", use_container_width=True):
-            st.session_state["page"] = "create_event"
-            st.rerun()
-
-        st.write("---")
 
     # Get the user info from the stuff
     user = st.session_state["user"]
@@ -314,7 +322,17 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
                 st.markdown("##### Claimed Needs:")
                 for item, claimer in event_claimed:
                     st.markdown(f"- {item} claimed by {claimer}")
-                    
+                st.write("")
+                st.write("---")
+                if st.button("Cancel Event", key="cancel_event_btn", use_container_width=True, type="primary"):
+                    with st.spinner("Cancelling event..."):
+                        time.sleep(1)
+                        events.remove(selected_event)
+                        save_events(events)
+                        st.success("Event cancelled.")
+                        time.sleep(2)
+                        st.session_state["page"] = "home"
+                        st.rerun()
 
 
 elif st.session_state["logged_in"] and st.session_state["role"] not in ("Admin", "Attendee", "databaseview"):
@@ -323,74 +341,90 @@ elif st.session_state["logged_in"] and st.session_state["role"] not in ("Admin",
 
 
 else:
+    if st.session_state["page"] == "dashboard":
+        st.title("Community Event Manager App")
+        st.markdown("Log in or create an account below")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Go to Login", key="login_btn", use_container_width=True, type="primary"):
+                st.session_state["page"] = "login"
+                st.rerun()
+        with col2:
+            if st.button("Create Account", key="register_btn", use_container_width=True):
+                st.session_state["page"] = "register"
+                st.rerun()
 
     # Login Page
-    st.subheader("Log In")
-    with st.container(border=True):
-        username_input = st.text_input("Username", key="username_login")
-        password_input = st.text_input("Password", type="password", key="password_login")
+    if st.session_state["page"] == "login":
+        st.subheader("Log In")
+        with st.container(border=True):
+            username_input = st.text_input("Username", key="username_login")
+            password_input = st.text_input("Password", type="password", key="password_login")
 
-        if st.button("Log In", type="primary", use_container_width=True):
-            with st.spinner("Logging In..."):
-                time.sleep(2) # Fake backend delay
-                found_user = None
-                for user in users:
-                    if user["username"].strip().lower() == username_input.strip().lower() and user["password"] == password_input:
-                        found_user = user
-                        break
+            if st.button("Log In", type="primary", use_container_width=True):
+                with st.spinner("Logging In..."):
+                    time.sleep(2) 
+                    found_user = None
+                    for user in users:
+                        if user["username"].strip().lower() == username_input.strip().lower() and user["password"] == password_input:
+                            found_user = user
+                            break
 
-                if found_user:
-                    st.success(f"Welcome Back, {found_user['username']}!")
-                    st.session_state["logged_in"] = True
-                    st.session_state["user"] = found_user
-                    st.session_state["role"] = found_user["role"]
-                    if st.session_state["role"] == "Admin":
-                        st.session_state["page"] = "home"
-                    if st.session_state["role"] == "Attendee":
-                        st.session_state["page"] = "dashboard"
-                    time.sleep(1)
-                    st.rerun()
-                else:
-                    st.error("Login failed. Check your username/password.")
+                    if found_user:
+                        st.success(f"Welcome Back, {found_user['username']}!")
+                        st.session_state["logged_in"] = True
+                        st.session_state["user"] = found_user
+                        st.session_state["role"] = found_user["role"]
+                        if st.session_state["role"] == "Admin":
+                            st.session_state["page"] = "home"
+                        if st.session_state["role"] == "Attendee":
+                            st.session_state["page"] = "dashboard"
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.error("Login failed. Check your username/password.")
 
-    # Register a New Account
-    st.subheader("Register")
-    with st.container(border=True):
+        st.write("---")
         if st.button("Create New Account", key="show_register_btn", use_container_width=True):
             st.session_state["page"] = "register"
             st.rerun()
 
-        if st.session_state["page"] == "register":
-            with st.container(border=True):
-                new_name = st.text_input("Full Name", key="full_name_register")
-                new_username = st.text_input("Username", key="username_register")
-                new_password = st.text_input("Password", type="password", key="password_register")
-                new_role = st.selectbox("Role", ["Admin", "Attendee"], key="role_register")
+    # Register a New Account
+    if st.session_state["page"] == "register":
+        st.subheader("Register")
+        if st.button("Back to Login", key="back_to_login_btn", use_container_width=True):
+            st.session_state["page"] = "login"
+            st.rerun()
+        with st.container(border=True):
+            new_name = st.text_input("Full Name", key="full_name_register")
+            new_username = st.text_input("Username", key="username_register")
+            new_password = st.text_input("Password", type="password", key="password_register")
+            new_role = st.selectbox("Role", ["Admin", "Attendee"], key="role_register")
 
-            if st.button("Create Account", key="register_btn", use_container_width=True):
-                with st.spinner("Creating Account..."):
-                    if not new_username.strip() or not new_password.strip():
-                        st.error("Username and password are required.")
-                    elif any(u["username"].strip().lower() == new_username.strip().lower() for u in users):
-                        st.error("That username already exists.")
-                    else:
-                        new_user = {
-                            "user_id": next_user_id(users),
-                            "full_name": new_name.strip(),
-                            "username": new_username.strip(),
-                            "password": new_password,
-                            "role": new_role,
-                            "registered_at": datetime.now().isoformat(timespec="seconds"),
-                        }
-                        users.append(new_user)
-                        save_users(users)
-                        st.success("Account created! Logging you in...")
-                        st.session_state["logged_in"] = True
-                        st.session_state["user"] = new_user
-                        st.session_state["role"] = new_user["role"]
-                        st.session_state["page"] = "home"
-                        time.sleep(1)
-                        st.rerun()
+        if st.button("Create Account", key="register_btn", use_container_width=True):
+            with st.spinner("Creating Account..."):
+                if not new_username.strip() or not new_password.strip():
+                    st.error("Username and password are required.")
+                elif any(u["username"].strip().lower() == new_username.strip().lower() for u in users):
+                    st.error("That username already exists.")
+                else:
+                    new_user = {
+                        "user_id": next_user_id(users),
+                        "full_name": new_name.strip(),
+                        "username": new_username.strip(),
+                        "password": new_password,
+                        "role": new_role,
+                        "registered_at": datetime.now().isoformat(timespec="seconds"),
+                    }
+                    users.append(new_user)
+                    save_users(users)
+                    st.success("Account created! Logging you in...")
+                    st.session_state["logged_in"] = True
+                    st.session_state["user"] = new_user
+                    st.session_state["role"] = new_user["role"]
+                    st.session_state["page"] = "home"
+                    time.sleep(1)
+                    st.rerun()
 
     st.write("---")
 
@@ -398,12 +432,7 @@ else:
 # Do the Sidebar
 with st.sidebar:
     st.title("Event Manager Sidebar")
-    if  st.session_state["logged_in"] == True:
-        user = st.session_state["user"]
-        st.markdown(f"**User:** {user['username']}")
-        st.markdown(f"**Role:** {user['role']}")
-        st.write("---")
-        if st.button("Log Out", use_container_width= True):
+    if st.button("Log Out", use_container_width= True):
             with st.spinner("Logging Out..."):
                 st.session_state["logged_in"] = False
                 st.session_state["user"] = None
@@ -411,11 +440,37 @@ with st.sidebar:
                 st.session_state["page"]= "login"
                 time.sleep(2)
                 st.rerun()
+                
+    if st.session_state["logged_in"] == True:
+        user = st.session_state["user"]
+        st.markdown(f"**User:** {user['username']}")
+        st.markdown(f"**Role:** {user['role']}")
+        st.write("---")
+        if st.session_state["role"] == "Attendee":
+            if st.session_state.get("page") == "dashboard":
+                if st.button("Sign Up for an Event", key="sidebar_attendee_signup_btn", use_container_width=True, type="primary"):
+                    st.session_state["page"] = "sign_up"
+                    st.rerun()
+            elif st.session_state.get("page") == "sign_up":
+                if st.button("Back to Dashboard", key="sidebar_attendee_back_btn", use_container_width=True):
+                    st.session_state["page"] = "dashboard"
+                    st.rerun()
+            st.write("---")
+        if st.session_state["role"] == "Admin":
+            if st.session_state.get("page") == "home":
+                if st.button("Create New Event", key="sidebar_admin_create_btn", use_container_width=True, type="primary"):
+                    st.session_state["page"] = "create_event"
+                    st.rerun()
+            elif st.session_state.get("page") == "create_event":
+                if st.button("Back to Dashboard", key="sidebar_admin_back_btn", use_container_width=True):
+                    st.session_state["page"] = "home"
+                    st.rerun()
+        
     else:
-        st.markdown("Please log in to access the dashboard.")
-        #st.markdown("Use following for database view:")
-        #st.markdown("- Username: dbview")
-        #st.markdown("- Password: password")
-        #st.markdown("Admin view: joey")
-        #st.markdown("Attendee view: jim")
+        st.markdown("Please log in to access your dashboard.")
+        st.markdown("Use following for database view:")
+        st.markdown("- Username: dbview")
+        st.markdown("- Password: password")
+        st.markdown("Admin view: joey")
+        st.markdown("Attendee view: jim")
 
