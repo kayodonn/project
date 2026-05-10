@@ -33,7 +33,7 @@
       "Tools": 0,
       "Pottery Wheel": 0
     },
-    "event_date": "2026-04-15",
+    "event_date": "2026-07-15",
     "event_location": "Pottery Studio"
   },
   {
@@ -50,14 +50,15 @@
   },
   {
     "event_id": "5",
-    "title": "Party",
+    "title": "Zebra Themed Party",
     "host_id": "4",
     "needs_list": {
       "Plates": 0,
       "Dessert": 0,
-      "Dinner": 0
+      "Dinner": 0,
+      "Decor": 0
     },
-    "event_date": "2026-04-15",
+    "event_date": "2026-06-17",
     "event_location": "My Place"
   },
   {
