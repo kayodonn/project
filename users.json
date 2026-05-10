@@ -53,5 +53,29 @@
     "password": "marie",
     "role": "Admin",
     "registered_at": "2026-04-05T21:25:54"
+  },
+  {
+    "user_id": "8",
+    "full_name": "Anna",
+    "username": "annabanana",
+    "password": "banana",
+    "role": "Attendee",
+    "registered_at": "2026-05-10T00:06:00"
+  },
+  {
+    "user_id": "9",
+    "full_name": "Candice",
+    "username": "candycandice",
+    "password": "candy",
+    "role": "Attendee",
+    "registered_at": "2026-05-10T00:07:30"
+  },
+  {
+    "user_id": "10",
+    "full_name": "Toby",
+    "username": "touristtoby",
+    "password": "tourist",
+    "role": "Admin",
+    "registered_at": "2026-05-10T00:09:09"
   }
 ]

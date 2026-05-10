@@ -43,7 +43,7 @@
     "needs_list": {
       "cake": 0,
       "balloons": "jim the guy",
-      "streamers": 0
+      "streamers": "Candice"
     },
     "event_date": "2026-04-04",
     "event_location": "My house"
@@ -53,7 +53,9 @@
     "title": "Party",
     "host_id": "4",
     "needs_list": {
-      "Plates": 0
+      "Plates": 0,
+      "Dessert": 0,
+      "Dinner": 0
     },
     "event_date": "2026-04-15",
     "event_location": "My Place"
@@ -71,13 +73,18 @@
     "event_location": "Local Park"
   },
   {
-    "event_id": "7",
-    "title": "cake",
-    "host_id": "4",
+    "event_id": "8",
+    "title": "Travel Preparation Workshop",
+    "host_id": "10",
     "needs_list": {
-      "cake": 0
+      "Sunscreen": 0,
+      "Hawaiian Shirts": 0,
+      "Hats": 0,
+      "Flip Flops": 0,
+      "Camera": 0,
+      "Hot Dogs": 0
     },
-    "event_date": "2026-04-05",
-    "event_location": "cake"
+    "event_date": "2026-05-10",
+    "event_location": "Community Room"
   }
 ]

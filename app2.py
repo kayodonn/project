@@ -297,42 +297,100 @@ elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
     with col2:
         if selected_event:
             with st.container(border=True):
-                st.header(f"{selected_event['title']}")
-                st.markdown(f"**Date:** {selected_event['event_date']}")
-                st.markdown(f"**Location:** {selected_event['event_location']}")
-                st.write("---")
-
-                st.markdown("#### Needs")
-
-                needs_list = selected_event.get("needs_list", {})
-                event_needs = []
-                event_claimed = []
-
-                if not needs_list:
-                    st.write("No items have been added to this event yet.")
+                if st.session_state.get("editing_event", False) and st.session_state.get("editing_event_id") == selected_event["event_id"]:
+                    # Edit mode
+                    st.header("Edit Event")
+                    edit_title = st.text_input("Event Title", value=selected_event["title"], key="edit_title")
+                    edit_date = st.date_input("Event Date", value=datetime.fromisoformat(selected_event["event_date"]).date(), key="edit_date")
+                    edit_location = st.text_input("Event Location", value=selected_event["event_location"], key="edit_location")
+                    
+                    st.markdown("#### Needs")
+                    st.markdown("Add items needed for this event (one per line):")
+                    needs_text = st.text_area("Needs List", value="\n".join(selected_event.get("needs_list", {}).keys()), key="edit_needs", height=100)
+                    
+                    col_save, col_cancel = st.columns(2)
+                    with col_save:
+                        if st.button("Save Changes", key="save_edit_btn", use_container_width=True, type="primary"):
+                            with st.spinner("Saving changes..."):
+                                # Update the event
+                                selected_event["title"] = edit_title.strip()
+                                selected_event["event_date"] = edit_date.isoformat()
+                                selected_event["event_location"] = edit_location.strip()
+                                
+                                # Update needs list - keep claimed items, update unclaimed
+                                new_needs = {}
+                                current_needs = selected_event.get("needs_list", {})
+                                
+                                # Parse the new needs from text area
+                                for line in needs_text.split('\n'):
+                                    item = line.strip()
+                                    if item:
+                                        # If item already exists and is claimed, keep the claimer
+                                        if item in current_needs and current_needs[item] not in [0, "", None]:
+                                            new_needs[item] = current_needs[item]
+                                        else:
+                                            new_needs[item] = 0
+                                
+                                selected_event["needs_list"] = new_needs
+                                save_events(events)
+                                st.success("Event updated successfully!")
+                                st.session_state["editing_event"] = False
+                                st.session_state["editing_event_id"] = None
+                                time.sleep(1)
+                                st.rerun()
+                    
+                    with col_cancel:
+                        if st.button("Cancel Edit", key="cancel_edit_btn", use_container_width=True):
+                            st.session_state["editing_event"] = False
+                            st.session_state["editing_event_id"] = None
+                            st.rerun()
                 else:
-                    for item, value in needs_list.items():
-                        if value == 0 or value == "" or value is None:
-                            event_needs.append(item)
-                        else:
-                            event_claimed.append((item, value))
-                st.markdown("##### Unclaimed Needs:")
-                for item in event_needs:
-                    st.markdown(f"- {item}")
-                st.markdown("##### Claimed Needs:")
-                for item, claimer in event_claimed:
-                    st.markdown(f"- {item} claimed by {claimer}")
-                st.write("")
-                st.write("---")
-                if st.button("Cancel Event", key="cancel_event_btn", use_container_width=True, type="primary"):
-                    with st.spinner("Cancelling event..."):
-                        time.sleep(1)
-                        events.remove(selected_event)
-                        save_events(events)
-                        st.success("Event cancelled.")
-                        time.sleep(2)
-                        st.session_state["page"] = "home"
-                        st.rerun()
+                    # View mode
+                    st.header(f"{selected_event['title']}")
+                    st.markdown(f"**Date:** {selected_event['event_date']}")
+                    st.markdown(f"**Location:** {selected_event['event_location']}")
+                    st.write("---")
+
+                    st.markdown("#### Needs")
+
+                    needs_list = selected_event.get("needs_list", {})
+                    event_needs = []
+                    event_claimed = []
+
+                    if not needs_list:
+                        st.write("No items have been added to this event yet.")
+                    else:
+                        for item, value in needs_list.items():
+                            if value == 0 or value == "" or value is None:
+                                event_needs.append(item)
+                            else:
+                                event_claimed.append((item, value))
+                    st.markdown("##### Unclaimed Needs:")
+                    for item in event_needs:
+                        st.markdown(f"- {item}")
+                    st.markdown("##### Claimed Needs:")
+                    for item, claimer in event_claimed:
+                        st.markdown(f"- {item} claimed by {claimer}")
+                    st.write("")
+                    st.write("---")
+                    
+                    col_edit, col_cancel = st.columns(2)
+                    with col_edit:
+                        if st.button("Edit Event", key="edit_event_btn", use_container_width=True):
+                            st.session_state["editing_event"] = True
+                            st.session_state["editing_event_id"] = selected_event["event_id"]
+                            st.rerun()
+                    
+                    with col_cancel:
+                        if st.button("Cancel Event", key="cancel_event_btn", use_container_width=True, type="primary"):
+                            with st.spinner("Cancelling event..."):
+                                time.sleep(1)
+                                events.remove(selected_event)
+                                save_events(events)
+                                st.success("Event cancelled.")
+                                time.sleep(2)
+                                st.session_state["page"] = "home"
+                                st.rerun()
 
 
 elif st.session_state["logged_in"] and st.session_state["role"] not in ("Admin", "Attendee", "databaseview"):
@@ -422,7 +480,10 @@ else:
                     st.session_state["logged_in"] = True
                     st.session_state["user"] = new_user
                     st.session_state["role"] = new_user["role"]
-                    st.session_state["page"] = "home"
+                    if st.session_state["role"] == "Admin":
+                        st.session_state["page"] = "home"
+                    if st.session_state["role"] == "Attendee":
+                        st.session_state["page"] = "dashboard"
                     time.sleep(1)
                     st.rerun()
 
