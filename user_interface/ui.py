@@ -98,10 +98,12 @@ def render_content():
 
 
 def render_database_view():
+    st.header("Welcome to Database View")
     st.markdown("## Users")
     users = user_service.get_all_users()
     st.dataframe(users)
-
+    
+    st.divider()
     st.markdown("## Events")
     events = event_service.get_all_events()
     st.dataframe(events)
@@ -119,6 +121,7 @@ def render_attendee():
 
 def render_attendee_dashboard():
     st.header("Attendee Dashboard")
+    st.divider()
     st.subheader("Your Events:")
 
     user = st.session_state["user"]
