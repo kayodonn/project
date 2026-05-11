@@ -6,11 +6,15 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from services.chatbot_service import build_ai_prompt, get_ai_response, get_events_context
 
-load_dotenv()
+env_path = Path(__file__).resolve().parents[1] / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY") or getattr(st, "secrets", {}).get("OPENAI_API_KEY")
 if not api_key:
-    st.error("OpenAI API Key was not found")
+    st.error(
+        "OpenAI API Key was not found. Set OPENAI_API_KEY in your .env file or in Streamlit secrets."
+    )
     st.stop()
 
 client = OpenAI(api_key=api_key)

@@ -1,11 +1,5 @@
-import os
-from dotenv import load_dotenv
 from openai import OpenAI
 from services.services import event_service
-
-load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY")
 
 # Service layer
 def build_ai_prompt(context: str):

@@ -3,9 +3,10 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
-from openai import OpenAI
 
-load_dotenv()
+env_path = Path(__file__).resolve().parent / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
 
 from user_interface.ui import render_content, render_sidebar
 
