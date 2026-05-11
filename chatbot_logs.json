@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "What events are being held on April 3rd 2026?"
+  },
+  {
+    "role": "assistant",
+    "content": "On April 3rd, 2026, the event \"Sunday Dinner\" is scheduled at Grandma's House. Available items for this event include Plates, Pasta, Cheese, and Cookies. Meatballs have already been claimed by Jim the guy."
+  }
+]
