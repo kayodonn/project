@@ -1,5 +1,11 @@
 import streamlit as st
 from pathlib import Path
+import os
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
 
 from user_interface.ui import render_content, render_sidebar
 
@@ -28,6 +34,20 @@ if "editing_event" not in st.session_state:
 
 if "editing_event_id" not in st.session_state:
     st.session_state["editing_event_id"] = None
+
+if "chatbot_open" not in st.session_state:
+    st.session_state["chatbot_open"] = False
+
+if "chatbot_open" not in st.session_state:
+    st.session_state["chatbot_open"] = False
+
+if "chatbot_history" not in st.session_state:
+    st.session_state["chatbot_history"] = []
+
+if "chatbot_input" not in st.session_state:
+    st.session_state["chatbot_input"] = ""
+
+
 
 
 # Make the side bar and content come up

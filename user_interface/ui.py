@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime
 from typing import Dict
 from services.services import user_service, event_service
-
+from user_interface.chatbot import render_chatbot
 
 
 def setup_session_state():
@@ -27,6 +27,7 @@ def setup_session_state():
 def render_sidebar():
     with st.sidebar:
         st.title("Event Manager Sidebar")
+
         if st.button("Log Out", use_container_width=True):
             logout()
 
@@ -35,6 +36,10 @@ def render_sidebar():
             st.markdown(f"**User:** {user['username']}")
             st.markdown(f"**Role:** {user['role']}")
             st.write("---")
+
+            if st.button("Chatbot Assistant", use_container_width=True, type="secondary"):
+                st.session_state["chatbot_open"] = True
+                st.rerun()
 
             if st.session_state["role"] == "Attendee":
                 if st.session_state.get("page") == "dashboard":
@@ -74,12 +79,18 @@ def logout():
 
 
 def render_content():
+    
+
     if st.session_state["logged_in"] and st.session_state["role"] == "databaseview":
         render_database_view()
     elif st.session_state["logged_in"] and st.session_state["role"] == "Attendee":
         render_attendee()
+        if st.session_state.get("chatbot_open", False):
+            render_chatbot()
     elif st.session_state["logged_in"] and st.session_state["role"] == "Admin":
         render_admin()
+        if st.session_state.get("chatbot_open", False):
+            render_chatbot()
     elif st.session_state["logged_in"] and st.session_state["role"] not in ("Admin", "Attendee", "databaseview"):
         st.info("No dashboard for this role yet. Try logging in as another role.")
     else:

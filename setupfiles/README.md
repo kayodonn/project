@@ -54,3 +54,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+## Chatbot Integration
+
+This app supports an AI-powered chatbot that can answer questions about events and available items.
+
+- Add `OPENAI_API_KEY` to your `.env` file
+- The chatbot is opened by pressing the `Open Chatbot` button in the sidebar
+- It can answer questions such as:
+  - "What events are being held?"
+  - "What items are still available for [event name]?"
+  - "Where is [event name] happening?"
+  - "What is the date of [event name]?"
