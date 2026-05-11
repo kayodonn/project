@@ -118,8 +118,8 @@ def render_attendee():
 
 
 def render_attendee_dashboard():
-    st.title("Attendee Dashboard")
-    st.header("Your Events")
+    st.header("Attendee Dashboard")
+    st.subheader("Your Events:")
 
     user = st.session_state["user"]
     events = event_service.get_all_events()
@@ -151,7 +151,7 @@ def render_attendee_dashboard():
 
 
 def render_attendee_sign_up():
-    st.title("Sign Up for an Event")
+    st.header("Sign Up for an Event")
     st.header("All Events")
     st.subheader("Select an event to sign up.")
 
@@ -207,7 +207,7 @@ def render_admin():
 
 
 def render_admin_create_event():
-    st.title("Create New Event")
+    st.header("Create New Event")
     if st.button("Back to Event Dashboard", key="admin_back_btn", use_container_width=True):
         st.session_state["page"] = "home"
         st.rerun()
@@ -243,14 +243,14 @@ def render_admin_create_event():
 
 
 def render_admin_dashboard():
-    st.title("Admin Dashboard")
+    st.header("Admin Dashboard")
     user = st.session_state["user"]
     events = event_service.get_all_events()
     user_events = [event for event in events if event["host_id"] == user["user_id"]]
 
     col1, col2 = st.columns([3, 5])
     with col1:
-        st.header("Your Events")
+        st.subheader("Your Events")
         if not user_events:
             st.info("You have not created any events yet.")
             selected_event = None
@@ -346,7 +346,7 @@ def render_admin_event_edit(selected_event: Dict):
 
 def render_public():
     if st.session_state["page"] == "dashboard":
-        st.title("Community Event Manager App")
+        st.subheader("Community Event Manager App")
         st.markdown("Log in or create an account below")
         col1, col2 = st.columns(2)
         with col1:

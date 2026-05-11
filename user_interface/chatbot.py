@@ -106,7 +106,7 @@ def render_chatbot():
     col1, col2 = st.columns([1, 1])
     if col1.button("Close Chatbot"):
         st.session_state["chatbot_open"] = False
-        st.experimental_rerun()
+        st.rerun()
     if col2.button("Reset Chat"):
         st.session_state["messages"] = [
             {
@@ -114,4 +114,4 @@ def render_chatbot():
                 'content': "Hi, ask me about events or available items!"
             }
         ]
-        st.experimental_rerun()
+        st.rerun()
