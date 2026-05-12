@@ -1,9 +1,9 @@
 from openai import OpenAI
-from services.services import event_service
+from .services import event_service
 
 # Service layer
 def build_ai_prompt(context: str):
-    return "" \
+    return \
     " You are a helpful community event assistant. " \
     "Answer user questions based on the provided event data. " \
     "Include relevant data in the response. " \

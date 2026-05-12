@@ -82,6 +82,8 @@ def render_chatbot():
         with st.chat_message('user'):
             st.markdown(user_input)
 
+        
+        
         with st.chat_message("assistant"):
             with st.spinner("Thinking...."):
                 context = get_events_context()

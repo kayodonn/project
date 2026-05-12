@@ -11,7 +11,6 @@ if env_path.exists():
 from user_interface.ui import render_content, render_sidebar
 
 st.set_page_config(page_title="Community Event Manager", layout="centered")
-st.title("Community Event Manager")
 
 
 # Set up the session states
@@ -35,9 +34,6 @@ if "editing_event" not in st.session_state:
 
 if "editing_event_id" not in st.session_state:
     st.session_state["editing_event_id"] = None
-
-if "chatbot_open" not in st.session_state:
-    st.session_state["chatbot_open"] = False
 
 if "chatbot_open" not in st.session_state:
     st.session_state["chatbot_open"] = False

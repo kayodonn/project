@@ -26,7 +26,7 @@ def setup_session_state():
 
 def render_sidebar():
     with st.sidebar:
-        st.title("Event Manager Sidebar")
+        st.title("Community Event Manager")
 
         if st.button("Log Out", use_container_width=True):
             logout()
@@ -134,35 +134,38 @@ def render_attendee_dashboard():
 
     for event in user_events:
         with st.container(border=True):
-            st.markdown(f"### **{event['title']}**")
-            st.markdown(f"**Date:** {event['event_date']}")
-            st.markdown(f"**Location:** {event['event_location']}")
-            st.markdown("Needs you have signed up for:")
-            for item, claimer in event["needs_list"].items():
-                if claimer == user["full_name"]:
-                    st.markdown(f"- {item}")
-            st.write("")
-            st.write("---")
-            if st.button("Leave Event", key=f"leave_event_btn_{event['event_id']}", type="secondary"):
-                with st.spinner("Processing your request..."):
-                    for item in event["needs_list"]:
-                        if event["needs_list"][item] == user["full_name"]:
-                            event["needs_list"][item] = 0
-                    event_service.update_event(event)
-                    st.success(f"You have left {event['title']}.")
-                    st.rerun()
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f"### **{event['title']}**")
+                st.divider()
+                st.markdown(f"**Date:** {event['event_date']}")
+                st.markdown(f"**Location:** {event['event_location']}")
+                st.markdown("Needs you have signed up for:")
+                for item, claimer in event["needs_list"].items():
+                    if claimer == user["full_name"]:
+                        st.markdown(f"- {item}")
+            with col2:
+                if st.button("Leave Event", key=f"leave_event_btn_{event['event_id']}", type="secondary"):
+                    with st.spinner("Processing your request..."):
+                        for item in event["needs_list"]:
+                            if event["needs_list"][item] == user["full_name"]:
+                                event["needs_list"][item] = 0
+                        event_service.update_event(event)
+                        st.success(f"You have left {event['title']}.")
+                        st.rerun()
 
 
 def render_attendee_sign_up():
     st.header("Sign Up for an Event")
-    st.header("All Events")
-    st.subheader("Select an event to sign up.")
+    st.divider()
+    
 
     events = event_service.get_all_events()
     col1, col2 = st.columns([3, 5])
 
     with col1:
-        selected_event = st.radio("Events", options=events, key="attendee_event_selector", format_func=lambda x: f"{x['title']}")
+        st.markdown("#### Select an event below:")
+        selected_event = st.radio("", options=events, key="attendee_event_selector", format_func=lambda x: f"{x['title']}")
 
     with col2:
         with st.container(border=True):
@@ -210,17 +213,17 @@ def render_admin():
 
 
 def render_admin_create_event():
-    st.header("Create New Event")
     if st.button("Back to Event Dashboard", key="admin_back_btn", use_container_width=True):
         st.session_state["page"] = "home"
         st.rerun()
 
     with st.container(border=True):
+        st.title("Enter New Event Details Below:")
         title = st.text_input("Event Title")
         event_date = st.date_input("Event Date")
         event_location = st.text_input("Location")
         needs_raw = st.text_area("Needs List (one item per line)")
-        submitted = st.button("Save Event", key="save_event_btn", use_container_width=True)
+        submitted = st.button("Save Event", key="save_event_btn", use_container_width=True, type = "primary")
 
     if submitted:
         if not title.strip() or not event_location.strip():
@@ -280,13 +283,13 @@ def render_admin_event_view(selected_event: Dict):
     st.markdown(f"**Date:** {selected_event['event_date']}")
     st.markdown(f"**Location:** {selected_event['event_location']}")
     st.write("---")
-    st.markdown("#### Needs")
+    st.markdown("#### Event Needs")
 
     needs_list = selected_event.get("needs_list", {})
     event_needs = [item for item, value in needs_list.items() if value in [0, "", None]]
     event_claimed = [(item, value) for item, value in needs_list.items() if value not in [0, "", None]]
 
-    st.markdown("##### Unclaimed Needs:")
+    st.markdown("###### Unclaimed Needs:")
     for item in event_needs:
         st.markdown(f"- {item}")
 
@@ -368,6 +371,7 @@ def render_public():
 
 
 def render_login():
+    st.title("Community Event Manager")
     st.subheader("Log In")
     with st.container(border=True):
         username_input = st.text_input("Username", key="username_login")

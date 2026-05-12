@@ -15,7 +15,7 @@
     "title": "Sunday Dinner",
     "host_id": "4",
     "needs_list": {
-      "Meatballs": "jim the guy",
+      "Meatballs": 0,
       "Plates": 0,
       "Pasta": 0,
       "Cheese": 0,
@@ -31,7 +31,7 @@
     "needs_list": {
       "Clay": 0,
       "Tools": 0,
-      "Pottery Wheel": 0
+      "Pottery Wheel": "jim the guy"
     },
     "event_date": "2026-07-15",
     "event_location": "Pottery Studio"
@@ -55,7 +55,7 @@
     "needs_list": {
       "Plates": 0,
       "Dessert": 0,
-      "Dinner": 0,
+      "Dinner": "jim the guy",
       "Decor": 0
     },
     "event_date": "2026-06-17",
